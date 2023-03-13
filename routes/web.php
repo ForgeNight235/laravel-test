@@ -54,8 +54,8 @@ Route::get('/home', function (){
 
 Route::controller(IndexController::class)->group(function (){
    Route::get('/', 'home')->name('home');
-   Route::get('/signup', 'signup');
-   Route::get('/signin', 'signin');
+   Route::get('/signup', 'signup')->name('signup');
+   Route::get('/signin', 'signin')->name('signin');
 });
 
 //Route::controller(\App\Http\Controllers\AuthController::class)->group(function(){
@@ -66,6 +66,24 @@ Route::controller(IndexController::class)->group(function (){
 //OR!!!
 Route::controller(\App\Http\Controllers\AuthController::class)->prefix('/auth')->as('auth.')->group(function(){
     Route::post('/signup', 'signup')->name('signup');
-
+    Route::post('/signin', 'signin')->name('signin'); // auth.signin
     Route::get('/logout', 'logout')->name('logout') ;
+});
+
+
+
+
+
+
+Route::controller(\App\Http\Controllers\ArticleController::class)->prefix('/articles')->as('article.')->group(function () {
+    Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->group(function (){
+        Route::get('/create', 'createForm')->name('createForm');
+        Route::get('/{article:id}/update', 'updateForm')->name('updateForm');
+        Route::post('/create', 'store')->name('create');
+        Route::get('/{article:id}/delete', 'delete')->name('delete');
+        Route::post('/{article:id}/update', 'update')->name('update');
+    });
+
+
+   Route::get('/{article:id}', 'single')->name('single');
 });

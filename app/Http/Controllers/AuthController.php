@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SignInRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,9 +48,15 @@ class AuthController extends Controller
         return redirect()->route('home');
     }
 
-    public function signin()
-    {
+    public function signin(SignInRequest $request) {
+        $validated = $request->validated();
 
+        if(!Auth::attempt($validated)) {
+            return back()->withErrors(['Invalid credentials']);
+        }
+
+        return redirect()->route('home');
+//        Auth::attempt($validated);
     }
 
     public function logout()
