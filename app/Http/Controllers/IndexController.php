@@ -7,9 +7,19 @@ use Illuminate\Http\Request;
 
 class IndexController extends Controller
 {
-    public function home()
+    public function home(Request $request)
     {
-        $articles = Article::query()->where('is_published', '=', true)->get();
+        $articles = Article::query()->where('is_published', '=', true);
+
+        if($request->get('query'))
+        {
+            $query = $request->get('query');
+            $articles = $articles
+                ->where('title', 'LIKE', "%$query%")
+                ->orWhere('short_text', 'LINK');
+        }
+
+        $articles = $articles->paginate(3)->withQueryString();
 
         return view('home', [
             'articles' => $articles
@@ -23,5 +33,6 @@ class IndexController extends Controller
     {
         return view('signin');
     }
+
 
 }

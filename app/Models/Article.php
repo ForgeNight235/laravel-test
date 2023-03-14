@@ -27,6 +27,12 @@ class Article extends Model
         return $this->hasOne(User::class, 'id', 'author_id')->first();
     }
 
+    // Статья имеет много комментов
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'article_id', 'id')->get();
+    }
+
     public function getImageUrlAttribute()
     {
         // http://127.0.0.8000/ - url

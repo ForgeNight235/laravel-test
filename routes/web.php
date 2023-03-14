@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\IndexController;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -87,3 +88,12 @@ Route::controller(\App\Http\Controllers\ArticleController::class)->prefix('/arti
 
    Route::get('/{article:id}', 'single')->name('single');
 });
+
+
+Route::controller(CommentController::class)
+    ->prefix('/comments')
+    ->as('comment.')
+    ->middleware('auth')
+    ->group(function (){
+       Route::post('/create', 'store')->name('store');
+    });

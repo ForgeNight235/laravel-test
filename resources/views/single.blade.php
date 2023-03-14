@@ -47,7 +47,7 @@
     <!-- Actions -->
     <section>
         <ul class="actions stacked">
-            <li><a href="#" class="button large fit">Log In</a></li>
+            <li><a href="{{ route('signin') }}" class="button large fit">Log In</a></li>
         </ul>
     </section>
 
@@ -60,7 +60,7 @@
     <article class="post">
         <header>
             <div class="title">
-                <h2><a href="single.html">{{ $article->title }}</a></h2>
+                <h2><a href="{{ route('article.single', $article) }}">{{ $article->title }}</a></h2>
                 <p>{{ $article->short_text }}</p>
             </div>
             <div class="meta">
@@ -68,19 +68,18 @@
                     {{ $article->created_at->format('M d, Y') }}
                 </time>
                 <a href="#" class="author"><span class="name">{{ $article->author()->username }}</span>
-                    <img src="{{ $article->image_url }}"
+                    <img src="{{ $article->author()->image_path }}"
                          alt="{{ $article->title }}" />
                 </a>
             </div>
         </header>
-        <a href="single.html" class="image featured">
+        <a href="{{ route('article.single', $article) }}" class="image featured">
             <img src="{{ $article->image_url }}"
                  alt="{{ $article->title }}" />
         </a>
         <p>{{ $article->content}}</p>
         <footer>
             <ul class="actions">
-{{--                <li><a href="single.html" class="button large">Continue Reading</a></li>--}}
             </ul>
             <ul class="stats">
                 <li><a href="#" class="icon solid fa-eye">
@@ -93,6 +92,73 @@
             </ul>
         </footer>
     </article>
+
+    @auth()
+        @if(Auth::user()->role === 'admin')
+            <a href="{{ route('article.delete', $article) }}">
+                Удалить статью
+            </a>
+        @endif
+    @endauth
+
+    <div class="comments">
+        @auth()
+        @if($errors->any())
+            @foreach($errors->all() as $error)
+                <div class="alert alert-danger" role="alert">
+                    {{ $error }}
+                </div>
+            @endforeach
+        @endif
+
+        <form method="post" action="{{ route('comment.store') }}" class="form-comment">
+            @csrf
+            <div class="form-group">
+                <label for="">Ваш комментарий:</label>
+                <textarea name="text" cols="20" rows="3"></textarea>
+            </div>
+
+            <input type="hidden" name="article_id" value="{{ $article->id }}">
+
+            <button>Add comment</button>
+        </form>
+        @endauth
+
+        @foreach($article->comments() as $comment)
+                <ul class="list">
+                    <li>
+                        <h3 class="author">
+                            {{ $comment->user()->username }}
+
+                        </h3>
+                        <p class="text">
+                            {{ $comment->text }}
+                        </p>
+                        <time>
+                            {{ $comment->created_at->format('M d, Y') }}
+                        </time>
+                    </li>
+                </ul>
+            @endforeach
+
+
+        <style>
+            .list{
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .list li{
+                padding: 24px;
+                background: #fff;
+                display: flex;
+                flex-direction: column;
+            }
+        </style>
+
+    </div>
 
 </div>
 
